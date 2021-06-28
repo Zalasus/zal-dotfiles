@@ -19,7 +19,7 @@ The prompt is not as sophisticated as powerline. Writing this was more about
 doing what zsh people have with the tools I had at hand.
 
 To use the prompt, source prompt.bash and add 
-`PROMPT_COMMAND="__prompt_update"` to your `.bashrc`. 
+`PROMPT_COMMAND="update_prompt"` to your `.bashrc`. 
 
 Also, you probably don't have to worry about this, but an ANSI compatible
 terminal is required. If you *do* care about this, you probably own a very
