@@ -48,7 +48,7 @@ update_prompt() {
         }
 
         exitcode() {
-            [[ $1 != 0 ]] && printf "$(sect 3)$1"
+            [[ $1 != 0 ]] && printf "$(sect 1)$1"
         }
 
         echo "$(sect 2)\\u@\\h$(git_info)$(sect 4) \\w \\\$$(exitcode $code)$(sect) "
