@@ -27,6 +27,9 @@ set ttimeoutlen=50
 " always display a status line even if there is only one window
 set laststatus=2
 
+" allow modified buffers to be hidden
+set hidden
+
 " use z key as leader
 let mapleader = "z"
 let g:mapleader = "z"
