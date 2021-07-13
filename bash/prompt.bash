@@ -44,6 +44,7 @@ update_prompt() {
                 printf "$(sect 5)"
                 printf ' \ue0a0'
                 printf "$branch"
+                [[ -n "$(git status --short)" ]] && printf '\u26a1'
             fi
         }
 
