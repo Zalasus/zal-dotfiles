@@ -15,10 +15,14 @@ set number
 
 " disable line wrap
 set nowrap
+set tw=120
 
 " enable mouse-terminal interaction
-set ttymouse=sgr
 set mouse=a
+if !has('nvim')
+    " only needed for classic vim. neovim does this automatically
+    set ttymouse=sgr
+endif
 
 " key timeout
 set ttimeout
@@ -30,6 +34,12 @@ set laststatus=2
 " allow modified buffers to be hidden
 set hidden
 
+" default spellcheck language
+set spelllang=en
+
+" create swap files out-of-tree
+set directory^=$HOME/.vim/tmp//
+
 " use z key as leader
 let mapleader = "z"
 let g:mapleader = "z"
@@ -37,8 +47,8 @@ let g:mapleader = "z"
 " buffer navigation commands
 nnoremap <leader>z :bprevious<CR>
 nnoremap <leader>u :bnext<CR>
-nnoremap <leader>i :enew<CR>
-nnoremap <leader>o :bd!<CR>
+nnoremap <leader>i :bd!<CR>
+nnoremap <leader>o :enew<CR>
 
 " session shortcuts
 nnoremap <F2> :mksession! ~/.vimsession<CR>
@@ -58,7 +68,6 @@ inoremap <Right> <nop>
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 nnoremap <leader>t :NERDTreeToggle<CR>
-autocmd BufWinEnter * silent NERDTreeMirror
 
 " ctrlp config
 " use The Silver Searcher for ctrlp
@@ -74,15 +83,18 @@ let g:tex_flavor = 'latex'
 let g:airline_powerline_fonts = 1
 let g:airline_theme = 'simple'
 let g:airline_highlighting_cache = 1
-let g:airline_extensions = ['tabline']
+let g:airline_extensions = ['branch', 'ctrlp', 'tabline']
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline#extensions#tabline#fnamemod = ':t'
 
 " cursor shapes (beam cursor in insert modes. very fancy :3)
-let &t_SI = "\<Esc>[5 q"
-let &t_EI = "\<Esc>[2 q"
+"  nvim does this automatically
+if !has('nvim')
+    let &t_SI = "\<Esc>[5 q"
+    let &t_EI = "\<Esc>[2 q"
+endif
 
-" don't fill horizontal splits with pipes
-set fillchars+=vert:\ 
+" use proper box-drawing character for vertical splits
+set fillchars+=vert:╏
 
