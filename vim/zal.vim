@@ -54,11 +54,11 @@ nnoremap <leader>o :enew<CR>
 nnoremap <F2> :mksession! ~/.vimsession<CR>
 nnoremap <F3> :source ~/.vimsession<CR>
 
-" make arrow keys useless for now so i get used to hjkl navigation
-noremap <Up> <nop>
-noremap <Down> <nop>
-noremap <Left> <nop>
-noremap <Right> <nop>
+" make arrow keys navigate splits rather than the cursor
+noremap <Up> <C-w>k
+noremap <Down> <C-w>j
+noremap <Left> <C-w>h
+noremap <Right> <C-w>l
 inoremap <Up> <nop>
 inoremap <Down> <nop>
 inoremap <Left> <nop>
