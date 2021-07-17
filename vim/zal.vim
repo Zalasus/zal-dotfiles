@@ -40,15 +40,19 @@ set spelllang=en
 " create swap files out-of-tree
 set directory^=$HOME/.vim/tmp//
 
-" use z key as leader
-let mapleader = "z"
-let g:mapleader = "z"
+" use system clipboard transparently when yanking
+set clipboard=unnamed
+
+" use space key as leader
+nnoremap <SPACE> <Nop>
+let mapleader = " "
+let g:mapleader = " "
 
 " buffer navigation commands
-nnoremap <leader>z :bprevious<CR>
-nnoremap <leader>u :bnext<CR>
-nnoremap <leader>i :bd!<CR>
-nnoremap <leader>o :enew<CR>
+nnoremap <leader>h :bprevious<CR>
+nnoremap <leader>l :bnext<CR>
+nnoremap <leader>d :bd!<CR>
+nnoremap <leader>n :enew<CR>
 
 " session shortcuts
 nnoremap <F2> :mksession! ~/.vimsession<CR>
