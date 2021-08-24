@@ -13,3 +13,4 @@ alias windoof="~/src/scripts/boot-windows.sh"
 
 alias ss2cb="maim -s | xclip -t image/png -selection clipboard"
 
+alias gits="git status"
