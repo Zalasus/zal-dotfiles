@@ -43,6 +43,9 @@ set directory^=$HOME/.vim/tmp//
 " use system clipboard transparently when yanking
 set clipboard=unnamed
 
+" smart case search (only use case sensitive search if query contains uppercase)
+set smartcase
+
 " use space key as leader
 nnoremap <SPACE> <Nop>
 let mapleader = " "
@@ -68,10 +71,28 @@ inoremap <Down> <nop>
 inoremap <Left> <nop>
 inoremap <Right> <nop>
 
+" delete without yanking
+nnoremap <leader>d "_d
+vnoremap <leader>d "_d
+
+" replace currently selected text with default register
+" without yanking it
+vnoremap <leader>p "_dP
+
 " nerdtree stuff
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 nnoremap <leader>t :NERDTreeToggle<CR>
+
+" fugitive via leader
+nnoremap <leader>g :G<CR>
+
+" terminal emulator stuff
+tnoremap <Esc> <C-\><C-n>
+
+" don't need indentation with motions
+nnoremap < <<
+nnoremap > >>
 
 " ctrlp config
 " use The Silver Searcher for ctrlp
@@ -81,6 +102,9 @@ let g:ctrlp_use_caching = 0
 
 " vimtex
 let g:tex_flavor = 'latex'
+
+" highlight matching parens by underlining them
+highlight MatchParen term=underline cterm=underline gui=underline ctermbg=NONE
 
 " ===== visual stuff =====
 " airline config
@@ -100,5 +124,7 @@ if !has('nvim')
 endif
 
 " use proper box-drawing character for vertical splits
-set fillchars+=vert:╏
+set fillchars+=vert:┃
 
+" startify splash
+let g:startify_custom_header = startify#pad(split(system('figlet nvim'), '\n'))
