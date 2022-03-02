@@ -12,7 +12,15 @@ list_passwords() {
 entry=$(list_passwords | rofi -dmenu -p "pass")
 [[ -z "$entry" ]] && exit
 
-password=$(pass "${entry}" | head -n 1) || exit 1
+# entries in the otp subdirectory are handled using the OTP extension.
+#  Note: this sorta defeats the purpose of two-factor-OTPs. in my case it
+#  if fine (probably) since all my passwords are encrypted using a key on a
+#  hardware token. might call this "one-and-a-half-factor".
+if [[ "${entry}" =~ ^otp/.* ]]; then
+    password=$(pass otp ${entry} | head -n 1) || exit 1
+else
+    password=$(pass "${entry}" | head -n 1) || exit 1
+fi
 
 xdotool type "${password}"
 
