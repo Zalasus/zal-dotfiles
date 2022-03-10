@@ -15,7 +15,7 @@ set number
 
 " disable line wrap
 set nowrap
-set tw=120
+set tw=999
 
 " enable mouse-terminal interaction
 set mouse=a
@@ -37,13 +37,16 @@ set hidden
 " default spellcheck language
 set spelllang=en
 
-" create swap files out-of-tree
-set directory^=$HOME/.vim/tmp//
+" don't create swap files. they tend to hang vim when the disk has high load,
+"  and my compulsive :w habit makes them superflous, anyway. also, when was the
+"  last time you saw vim crash?
+set noswapfile
 
 " use system clipboard transparently when yanking
 set clipboard=unnamed
 
 " smart case search (only use case sensitive search if query contains uppercase)
+set ignorecase
 set smartcase
 
 " use space key as leader
@@ -56,6 +59,10 @@ nnoremap <leader>h :bprevious<CR>
 nnoremap <leader>l :bnext<CR>
 nnoremap <leader>d :bd!<CR>
 nnoremap <leader>n :enew<CR>
+nnoremap <leader>q :q<CR>
+
+" faster compulsive saving
+nnoremap <leader>w :w<CR>
 
 " session shortcuts
 nnoremap <F2> :mksession! ~/.vimsession<CR>
