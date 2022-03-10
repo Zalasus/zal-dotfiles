@@ -1,5 +1,20 @@
 " Zal's vim config :3
 
+" load plugins, using vimplug
+call plug#begin('~/.local/share/nvim/plugged')
+Plug 'gentoo/gentoo-syntax'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'preservim/nerdtree'
+Plug 'rust-lang/rust.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'mhinz/vim-startify'
+Plug 'lervag/vimtex'
+call plug#end() 
+
+syntax enable
+filetype plugin indent on
+
 " don't care about vi compatibility
 set nocompatible
 
