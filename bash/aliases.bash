@@ -1,18 +1,33 @@
 
+has() {
+    [[ -x "$(which $1 2> /dev/null)" ]]
+}
+
 alias lsl="ls -lh"
 alias free="free -h"
 alias df="df -h"
 alias cp="cp --reflink=auto"
 
-alias lpoweroff="loginctl poweroff"
-alias lsuspend="loginctl suspend"
-alias lreboot="loginctl reboot"
-alias llock="loginctl lock-session"
-
-alias windoof="~/src/scripts/boot-windows.sh"
-
-alias ss2cb="maim -s | xclip -t image/png -selection clipboard"
+alias trim="sed 's/^[ \t]*//'"
 
 alias gits="git status"
 
-alias trim="sed 's/^[ \t]*//'"
+alias windoof="~/src/scripts/boot-windows.sh"
+
+if has loginctl; then
+    alias lpoweroff="loginctl poweroff"
+    alias lsuspend="loginctl suspend"
+    alias lreboot="loginctl reboot"
+    alias llock="loginctl lock-session"
+fi
+
+if has maim && has xclip; then
+    alias ss2cb="maim -s | xclip -t image/png -selection clipboard"
+fi
+
+if has nvim; then
+    alias vim="nvim"
+    alias vi="nvim"
+fi
+
+unset -f has
