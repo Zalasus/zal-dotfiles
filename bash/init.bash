@@ -4,15 +4,19 @@ if [[ $- != *i* ]] ; then
 	return
 fi
 
-. ./aliases.bash
-. ./completions.bash
+# getting the directory of the current script is a bit more complicated if
+#  the script is supposed to be sourced instead of run
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+. ${SCRIPT_DIR}/aliases.bash
+. ${SCRIPT_DIR}/completions.bash
 
 HISTCONTROL=ignoredups:erasedups
 shopt -s histappend
 
 # use my custom prompt if using a graphical terminal
 if [[ $TERM == "alacritty" ]]; then
-    . ./prompt.bash
+    . ${SCRIPT_DIR}/prompt.bash
     PROMPT_COMMAND="update_prompt"
 fi
 
@@ -23,3 +27,5 @@ gpgconf --launch gpg-agent
 
 # since i can't fix the dead key issues with xdotool, the'll just have to vanish from my passwords
 export PASSWORD_STORE_CHARACTER_SET="[:alnum:]+*/?!$%&(){}=_#~';:.,<>|@"
+
+unset SCRIPT_DIR
