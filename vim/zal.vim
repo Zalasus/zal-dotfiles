@@ -147,6 +147,3 @@ endif
 
 " use proper box-drawing character for vertical splits
 set fillchars+=vert:┃
-
-" startify splash
-let g:startify_custom_header = startify#pad(split(system('figlet nvim'), '\n'))
