@@ -133,7 +133,7 @@ highlight MatchParen term=underline cterm=underline gui=underline ctermbg=NONE
 let g:airline_powerline_fonts = 1
 let g:airline_theme = 'simple'
 let g:airline_highlighting_cache = 1
-let g:airline_extensions = ['branch', 'ctrlp', 'tabline']
+let g:airline_extensions = ['branch', 'tabline']
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline#extensions#tabline#fnamemod = ':t'
