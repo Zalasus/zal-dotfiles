@@ -10,9 +10,11 @@ alias cp="cp --reflink=auto"
 
 alias trim="sed 's/^[ \t]*//'"
 
-alias gits="git status"
-
 alias windoof="~/src/scripts/boot-windows.sh"
+
+if has git; then
+    alias gits="git status"
+fi
 
 if has loginctl; then
     alias lpoweroff="loginctl poweroff"
