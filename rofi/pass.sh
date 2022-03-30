@@ -25,6 +25,3 @@ fi
 xdotool type "${password}"
 
 unset password
-
-# to prevent my yubikey from caching the PIN. really sucks that this is necessary
-gpgconf --reload scdaemon
