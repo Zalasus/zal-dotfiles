@@ -1,0 +1,250 @@
+#!/bin/bash
+
+# zaltime - A radically stupid time tracker written in pure bash.
+#
+# Timelog record format:
+# <type> <timestamp> <args>
+# Record types:
+#  S - Start time recording
+#  E - End time recording
+#  T - Tag
+#  O - Option
+# Timestamps are seconds since 1970/1/1 0:00 UTC
+
+# set this to the path where you want the timelog to be written
+#  can be overriden by the ZT_TIMELOG environment variable
+DEFAULT_TIMELOG="${HOME}/.local/share/zaltime/timelog"
+
+die() {
+    echo $@ 1>&2 
+    exit 1
+}
+
+debug() { 
+    [[ "${DEBUG}" == 1 ]] && echo "DBUG> $@"
+}
+
+now() {
+    date '+%s'
+}
+
+record() {
+    local time=${at:-$(now)}
+    local type=$1
+    shift
+    echo "${type} ${time} $@" >> "${timelog}"
+    [[ "${at}" ]] && need_sorting=1
+}
+
+check_timefilter() {
+    date +%s --date="$1 0:00:00" &> /dev/null
+}
+
+filter_date() {
+    local day_begin=$(date +%s --date="$1 0:00:00")
+    local day_end=$(( day_begin + 24 * 60 * 60 ))
+    while read -r type time trailer; do
+        (( day_begin <= time && time < day_end )) && echo "${type} ${time} ${trailer}"
+    done
+}
+
+records() {
+    local prefixfilter="$1"
+    [[ -z "${prefixfilter}" ]] && die "Need prefix filter"
+    grep "^[$prefixfilter] " "${timelog}" 
+}
+
+last_record() {
+    records $@ | tail --lines 1
+}
+
+# converts a timestamp to the start of it's respective day
+start_of_day() {
+    local day=$(date '+%Y/%m/%d' --date="@$1")
+    date '+%s' --date="${day}"
+}
+
+# converts a timestamp to the end of it's respective day
+end_of_day() {
+    echo $(( $(start_of_day $1) + 24 * 60 * 60 ))
+}
+
+# transforms intervals of S and E records from stdin into their length in seconds
+#  right-open intervals are assumed to end at the end of their calendar day.
+#  left-open intervals are ignored
+intervals() {
+    local last_start
+    while read -r type time trailer; do
+        case "${type}" in
+            S)
+                [[ -z "${last_start}" ]] && last_start=${time};; # ignore repeated starts
+            E)
+                [[ -z "${last_start}" ]] && continue # ignore left-open intervals
+                echo $(( time - last_start ))
+                last_start=;;
+        esac
+    done
+    # handle right-open intervals
+    [[ "${last_start}" ]] && echo $(( $(end_of_day ${last_start}) - last_start ))
+}
+
+# sums all the integers read on stdin (one per line)
+sum() {
+    local total=0
+    while read -r line; do
+        (( total += line ))
+    done
+    echo ${total}
+}
+
+time_total() {
+    local timefilter=${1:-today}
+    records SE | filter_date ${timefilter} | intervals | sum
+}
+
+# formats a number of seconds as h:mm:ss
+seconds_readable_format() {
+    local h=$(( $1 / (60*60) ))
+    local m=$(( ( $1 / 60) % 60 ))
+    local s=$(( $1 % 60 ))
+    printf '%d:%02d:%02d\n' $h $m $s
+}
+
+tags() {
+    records T | filter_date $1 | cut -d ' ' -f 2-
+}
+
+is_recording() {
+    [[ "$(last_record SE)" == S* ]]
+}
+
+# sorts the timelog. useful for adding backdated start/stops or tags
+sort_timelog() {
+    debug "Sorting timelog"
+    local tmplog
+    tmplog=$(mktemp) || die "Failed to create temporary timelog for sorting"
+    sort --key=2g ${timelog} > "${tmplog}"
+    mv "${tmplog}" "${timelog}"
+}
+
+
+# ==== subcommands ====
+
+usage() {
+    echo "Usage: zt [options]... <command> [command args]..."
+    echo "Zaltime, a radically stupid time tracker."
+    echo "Options:"
+    echo "  -h, --help             - Display this message"
+    echo "  -a <time>, --at=<time> - Record event at given rather then current time"
+    echo "  -p, --parsable         - Write reports in a stable, parsable format"
+    echo "Valid commands:"
+    echo "  start          - Start recording"
+    echo "  end            - End recording"
+    echo "  stop           - Alias for end"
+    echo "  tag <tags>...  - Tag current activity"
+    echo "  report [day]   - Report accumulated time for today or given day"
+    echo "  fill <maxgap>  - Fill gaps smaller than maxgap"
+}
+
+start() {
+    [[ -z "${at}" ]] && is_recording && die "Already recording"
+    record S
+    echo "Started time recording"
+}
+
+end() {
+    [[ -z "${at}" ]] && ! is_recording && die "Not currently recording"
+    record E
+    echo "Ended time recording"
+}
+
+tag() {
+    for t in "$@"; do
+        record T "$t"
+        echo "Added tag \"$t\""
+    done
+}
+
+report() {
+    local timefilter=${1:-today}
+    check_timefilter "${timefilter}" || die "Bad time filter: ${timefilter}"
+
+    local total=$(time_total "${timefilter}")
+    local total_readable=$(seconds_readable_format ${total})
+
+    if (( parsable )); then
+        echo -n "${total} ${total_readable} "
+        is_recording && echo "recording" || echo "stopped"
+    else
+        local date=$(date '+%x' --date="${timefilter}")
+        echo "Time total for ${date}: ${total_readable}"
+        is_recording && echo "Currently recording time."
+        echo "Recorded tags:"
+        tags "${timefilter}" | while read -r time value; do
+            echo "  $(date '+%X' --date="@${time}") ${value}"
+        done 
+    fi
+}
+
+fill() {
+    die "Unimplemented. Sorry :/"
+}
+
+# ==== main script ====
+
+timelog=${ZT_TIMELOG:-"${DEFAULT_TIMELOG}"}
+timelog_dir=$(dirname "${timelog}")
+
+# make sure timelog exists and is writeable
+mkdir -p "${timelog_dir}" || die "Failed to create timelog directory '${timelog_dir}'"
+touch "${timelog}" || die "Timelog file '${timelog}' is not writeable"
+
+# parse options and subcommands
+parsable=0
+at=
+while [[ "$@" ]]; do
+    case "$1" in
+        --at=*)
+            at=${1#--at=};;
+        -a)
+            [[ -z "$2" ]] && die "$1 option needs an argument"
+            at=$2
+            shift;;
+        --parsable|-p)
+            parsable=1;;
+        --help|-h)
+            usage
+            exit;;
+        --*|-?)
+            die "Unknown option '$1'";;
+        *)
+            subcommand="$1"
+            shift
+            break;;
+    esac
+    shift
+done
+
+if [[ "${at}" ]]; then
+    at=$(date '+%s' --date="${at}") || die "Invalid 'at' argument"
+    debug at argument = $at
+fi
+
+case "${subcommand}" in
+    '')
+        usage;;
+    start)
+        start;;
+    end|stop)
+        end;;
+    tag)
+        tag "$@";;
+    report)
+        report "$@";;
+    fill)
+        fill "$@";;
+    *)
+        die "Unknown command '${subcommand}'";;
+esac
+
+(( need_sorting )) && sort_timelog
