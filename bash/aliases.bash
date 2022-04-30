@@ -10,8 +10,6 @@ alias cp="cp --reflink=auto"
 
 alias trim="sed 's/^[ \t]*//'"
 
-alias windoof="~/src/scripts/boot-windows.sh"
-
 if has git; then
     alias gits="git status"
 fi
@@ -30,6 +28,12 @@ fi
 if has nvim; then
     alias vim="nvim"
     alias vi="nvim"
+fi
+
+# if applicable, register scripts from this repo
+if [[ -e "${SCRIPT_DIR}" ]]; then
+    alias zt="${SCRIPT_DIR}/zaltime/zt"
+    alias windoof="${SCRIPT_DIR}/boot-windows"
 fi
 
 unset -f has
