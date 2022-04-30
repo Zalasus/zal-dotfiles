@@ -11,9 +11,8 @@
 #  O - Option
 # Timestamps are seconds since 1970/1/1 0:00 UTC
 
-# set this to the path where you want the timelog to be written
-#  can be overriden by the ZT_TIMELOG environment variable
-DEFAULT_TIMELOG="${HOME}/.local/share/zaltime/timelog"
+# can be overriden by the ZT_TIMELOG environment variable
+DEFAULT_TIMELOG="${XDG_DATA_HOME:-${HOME}/.local/share}/zaltime/timelog"
 
 die() {
     echo $@ 1>&2 
