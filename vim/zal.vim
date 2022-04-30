@@ -10,6 +10,7 @@ Plug 'rust-lang/rust.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-startify'
 Plug 'lervag/vimtex'
+Plug 'ledger/vim-ledger'
 call plug#end() 
 
 syntax enable
