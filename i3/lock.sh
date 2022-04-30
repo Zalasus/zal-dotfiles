@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# simple script for calling i3lock with a blurred screenshot as background
+#  handles XSS lock mechanism
+
 set -e
 
 notify-send "Locking..."
