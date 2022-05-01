@@ -20,7 +20,7 @@ die() {
 }
 
 debug() { 
-    [[ "${DEBUG}" == 1 ]] && echo "DBUG> $@"
+    [[ "${DEBUG}" == 1 ]] && echo "DBUG> $@" 1>&2
 }
 
 now() {
@@ -36,13 +36,16 @@ record() {
 }
 
 check_timefilter() {
-    date +%s --date="$1 0:00:00" &> /dev/null
+    date +%s --date="$1" &> /dev/null
 }
 
 filter_date() {
-    local day_begin=$(date +%s --date="$1 0:00:00")
+    debug "start timefilter $1"
+    local day_ts=$(date +%s --date="$1")
+    local day_begin=$(start_of_day ${day_ts})
     local day_end=$(( day_begin + 24 * 60 * 60 ))
     while read -r type time trailer; do
+        debug "db:${day_begin} de:${day_end} time:${time} type:${type}"
         (( day_begin <= time && time < day_end )) && echo "${type} ${time} ${trailer}"
     done
 }
@@ -53,14 +56,10 @@ records() {
     grep "^[$prefixfilter] " "${timelog}" 
 }
 
-last_record() {
-    records $@ | tail --lines 1
-}
-
 # converts a timestamp to the start of it's respective day
 start_of_day() {
     local day=$(date '+%Y/%m/%d' --date="@$1")
-    date '+%s' --date="${day}"
+    date '+%s' --date="${day} 0:00:00"
 }
 
 # converts a timestamp to the end of it's respective day
@@ -98,7 +97,7 @@ sum() {
 
 time_total() {
     local timefilter=${1:-today}
-    records SE | filter_date ${timefilter} | intervals | sum
+    records SE | filter_date "${timefilter}" | intervals | sum
 }
 
 # formats a number of seconds as h:mm:ss
@@ -109,12 +108,8 @@ seconds_readable_format() {
     printf '%d:%02d:%02d\n' $h $m $s
 }
 
-tags() {
-    records T | filter_date $1 | cut -d ' ' -f 2-
-}
-
 is_recording() {
-    [[ "$(last_record SE)" == S* ]]
+    [[ "$(records SE | tail --lines 1)" == S* ]]
 }
 
 # sorts the timelog. useful for adding backdated start/stops or tags
@@ -169,7 +164,7 @@ report() {
     check_timefilter "${timefilter}" || die "Bad time filter: ${timefilter}"
 
     local total=$(time_total "${timefilter}")
-    local total_readable=$(seconds_readable_format ${total})
+    local total_readable=$(seconds_readable_format "${total}")
 
     if (( parsable )); then
         echo -n "${total} ${total_readable} "
@@ -179,8 +174,23 @@ report() {
         echo "Time total for ${date}: ${total_readable}"
         is_recording && echo "Currently recording time."
         echo "Recorded tags:"
-        tags "${timefilter}" | while read -r time value; do
-            echo "  $(date '+%X' --date="@${time}") ${value}"
+        local prev_time=0
+        local time_length
+        local time_length_half
+        records T | filter_date "${timefilter}" | while read -r type time value; do
+            local time_formatted=$(date '+%X' --date="@${time}")
+            if (( prev_time == 0 )); then
+                time_length=$(( ${#time_formatted} + 4 ))
+                time_length_half=$(( time_length / 2 ))
+                printf '  %-*s %s\n' ${time_length} "${time_formatted}" "${value}"
+            elif (( prev_time == time )); then
+                printf '  %-*s%*s %s\n' ${time_length_half} " |" ${time_length_half} " " "${value}"
+            else
+                local time_since_last_tag=$(seconds_readable_format $(( time - prev_time )) )
+                printf '  %-*s\n' ${time_length} " | +${time_since_last_tag}"
+                printf '  %-*s %s\n' ${time_length} "${time_formatted}" "${value}"
+            fi
+            prev_time=${time}
         done 
     fi
 }
