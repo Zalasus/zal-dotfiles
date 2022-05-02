@@ -173,13 +173,13 @@ report() {
     check_timefilter "${timefilter}" || die "Bad time filter: ${timefilter}"
 
     local total=$(time_total "${timefilter}")
-    local total_readable=$(seconds_readable_format "${total}")
 
     if (( parsable )); then
-        echo -n "${total} ${total_readable} "
+        echo -n "${total} "
         is_recording && echo "recording" || echo "stopped"
     else
         local date=$(date '+%x' --date="${timefilter}")
+        local total_readable=$(seconds_readable_format "${total}")
         echo "Time total for ${date}: ${total_readable}"
         is_recording && echo "Currently recording time."
         echo "Recorded tags:"
