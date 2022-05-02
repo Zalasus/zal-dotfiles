@@ -268,3 +268,5 @@ case "${subcommand}" in
 esac
 
 (( need_sorting )) && sort_timelog
+
+exit 0
