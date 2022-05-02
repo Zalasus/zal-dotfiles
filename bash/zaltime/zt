@@ -214,8 +214,10 @@ timelog=${ZT_TIMELOG:-"${DEFAULT_TIMELOG}"}
 timelog_dir=$(dirname "${timelog}")
 
 # make sure timelog exists and is writeable
-mkdir -p "${timelog_dir}" || die "Failed to create timelog directory '${timelog_dir}'"
-touch "${timelog}" || die "Timelog file '${timelog}' is not writeable"
+if ! [[ -w ${timelog} ]]; then
+    mkdir -p "${timelog_dir}" || die "Failed to create timelog directory '${timelog_dir}'"
+    touch "${timelog}" || die "Timelog file '${timelog}' is not writeable"
+fi
 
 # parse options and subcommands
 parsable=0
