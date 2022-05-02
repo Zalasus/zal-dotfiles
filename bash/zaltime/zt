@@ -83,7 +83,16 @@ intervals() {
         esac
     done
     # handle right-open intervals
-    [[ "${last_start}" ]] && echo $(( $(end_of_day ${last_start}) - last_start ))
+    #  if end of day is in the past, use that as end. otherwise, use current date
+    if [[ "${last_start}" ]]; then
+        local now=$(now)
+        local end_of_day=$(end_of_day ${last_start})
+        if (( end_of_day > now )); then
+            echo $(( now - last_start ))
+        else
+            echo $(( end_of_day - last_start ))
+        fi
+    fi
 }
 
 # sums all the integers read on stdin (one per line)
