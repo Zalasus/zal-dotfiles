@@ -15,10 +15,18 @@ if has git; then
 fi
 
 if has loginctl; then
-    alias lpoweroff="loginctl poweroff"
-    alias lsuspend="loginctl suspend"
-    alias lreboot="loginctl reboot"
     alias llock="loginctl lock-session"
+
+    # the logind power management works with polkit. shame
+    if has pkexec; then
+        alias lpoweroff="loginctl poweroff"
+        alias lsuspend="loginctl suspend"
+        alias lreboot="loginctl reboot"
+    else
+        alias lpoweroff="sudo shutdown -hP now"
+        alias lreboot="sudo shutdown -r now"
+        alias lsuspend="sudo ${SCRIPT_DIR}/suspend"
+    fi
 fi
 
 if has maim && has xclip; then
@@ -34,6 +42,12 @@ fi
 if [[ -e "${SCRIPT_DIR}" ]]; then
     alias zt="${SCRIPT_DIR}/zaltime/zt"
     alias windoof="${SCRIPT_DIR}/boot-windows"
+fi
+
+if has equery; then
+    isusing() {
+        for PKG in $(equery -q hasuse $1); do echo $PKG: $(equery -q uses $PKG | grep $1); done
+    }
 fi
 
 unset -f has

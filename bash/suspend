@@ -1,0 +1,5 @@
+#!/bin/sh
+
+sync
+echo "deep" > /sys/power/mem_sleep
+echo "mem" > /sys/power/state
