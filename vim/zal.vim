@@ -31,7 +31,14 @@ set number
 
 " disable line wrap
 set nowrap
-set tw=999
+
+" sane textwidth of 100 chars. highlight the column *after* that limit
+set tw=100
+set colorcolumn=+1
+
+" highlight trailing whitespace
+highlight RedundantSpaces ctermbg=red guibg=red 
+match RedundantSpaces /\s\+$/
 
 " enable mouse-terminal interaction
 set mouse=a
