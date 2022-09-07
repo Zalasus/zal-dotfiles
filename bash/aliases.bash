@@ -23,9 +23,9 @@ if has loginctl; then
         alias lsuspend="loginctl suspend"
         alias lreboot="loginctl reboot"
     else
-        alias lpoweroff="sudo shutdown -hP now"
-        alias lreboot="sudo shutdown -r now"
-        alias lsuspend="sudo ${SCRIPT_DIR}/suspend"
+        alias lpoweroff="doas /sbin/shutdown -hP now"
+        alias lreboot="doas /sbin/shutdown -r now"
+        alias lsuspend="doas ${SCRIPT_DIR}/suspend"
     fi
 fi
 
