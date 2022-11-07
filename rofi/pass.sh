@@ -9,6 +9,16 @@ list_passwords() {
     find . -name '*.gpg' | sed -r 's/\.\/(.*)\.gpg$/\1/g'
 }
 
+check_dep() {
+    if [[ ! -x "$(which $1 2>/dev/null)" ]]; then
+        rofi -e "ERROR: $1 not found in PATH"
+        exit 1
+    fi
+}
+
+check_dep pass
+check_dep xdotool
+
 entry=$(list_passwords | rofi -dmenu -p "pass")
 [[ -z "$entry" ]] && exit
 
