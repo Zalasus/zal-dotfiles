@@ -11,7 +11,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-startify'
 Plug 'lervag/vimtex'
 Plug 'ledger/vim-ledger'
-call plug#end() 
+call plug#end()
 
 syntax enable
 filetype plugin indent on
@@ -37,7 +37,7 @@ set tw=100
 set colorcolumn=+1
 
 " highlight trailing whitespace
-highlight RedundantSpaces ctermbg=red guibg=red 
+highlight RedundantSpaces ctermbg=red guibg=red
 match RedundantSpaces /\s\+$/
 
 " enable mouse-terminal interaction
@@ -49,7 +49,7 @@ endif
 
 " key timeout
 set ttimeout
-set ttimeoutlen=50 
+set ttimeoutlen=50
 
 " always display a status line even if there is only one window
 set laststatus=2
@@ -87,9 +87,8 @@ nnoremap <leader>q :q<CR>
 " faster compulsive saving
 nnoremap <leader>w :w<CR>
 
-" session shortcuts
-nnoremap <F2> :mksession! ~/.vimsession<CR>
-nnoremap <F3> :source ~/.vimsession<CR>
+" startify session restore
+autocmd! VimLeave * SSave! Previous
 
 " make arrow keys navigate splits rather than the cursor
 noremap <Up> <C-w>k
@@ -155,3 +154,5 @@ endif
 
 " use proper box-drawing character for vertical splits
 set fillchars+=vert:┃
+
+
