@@ -5,12 +5,14 @@ call plug#begin('~/.local/share/nvim/plugged')
 Plug 'gentoo/gentoo-syntax'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'preservim/nerdtree'
+" Plug 'preservim/nerdtree'
 Plug 'rust-lang/rust.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-startify'
 Plug 'lervag/vimtex'
 Plug 'ledger/vim-ledger'
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'nvim-tree/nvim-tree.lua'
 call plug#end()
 
 syntax enable
@@ -111,7 +113,7 @@ vnoremap <leader>p "_dP
 " nerdtree stuff
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
-nnoremap <leader>t :NERDTreeToggle<CR>
+nnoremap <leader>t :NvimTreeToggle<CR>
 
 " fugitive via leader
 nnoremap <leader>g :G<CR>
@@ -134,6 +136,8 @@ let g:tex_flavor = 'latex'
 
 " highlight matching parens by underlining them
 highlight MatchParen term=underline cterm=underline gui=underline ctermbg=NONE
+
+lua require("nvim-tree").setup()
 
 " ===== visual stuff =====
 " airline config
