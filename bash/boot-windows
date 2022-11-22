@@ -2,4 +2,4 @@
 
 windows_entry=$(grep -i windows /boot/grub/grub.cfg | cut -d "'" -f 2)
 
-sudo grub-reboot "$windows_entry" && loginctl reboot
+doas sh -c "grub-reboot \"$windows_entry\" && reboot"
