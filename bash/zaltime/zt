@@ -183,21 +183,17 @@ report() {
         echo "Time total for ${date}: ${total_readable}"
         is_recording && echo "Currently recording time."
         echo "Recorded tags:"
-        local prev_time=0
-        local time_length
-        local time_length_half
+        local prev_time
         records T | filter_date "${timefilter}" | while read -r type time value; do
-            local time_formatted=$(date '+%X' --date="@${time}")
-            if (( prev_time == 0 )); then
-                time_length=$(( ${#time_formatted} + 4 ))
-                time_length_half=$(( time_length / 2 ))
-                printf '  %-*s %s\n' ${time_length} "${time_formatted}" "${value}"
-            elif (( prev_time == time )); then
-                printf '  %-*s%*s %s\n' ${time_length_half} " |" ${time_length_half} " " "${value}"
+            local time_formatted=$(date '+%H:%M:%S' --date="@${time}") # length = 8
+            if [[ -z ${prev_time} ]]; then
+                echo "  ${time_formatted}      ${value}"
+            elif [[ ${prev_time} == ${time} ]]; then
+                echo "   |            ${value}"
             else
                 local time_since_last_tag=$(seconds_readable_format $(( time - prev_time )) )
-                printf '  %-*s\n' ${time_length} " | +${time_since_last_tag}"
-                printf '  %-*s %s\n' ${time_length} "${time_formatted}" "${value}"
+                echo "   | +${time_since_last_tag}"
+                echo "  ${time_formatted}      ${value}"
             fi
             prev_time=${time}
         done 
