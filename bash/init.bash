@@ -26,4 +26,7 @@ if [[ $- == *i* ]] ; then
     export PASSWORD_STORE_CHARACTER_SET="[:alnum:]+*/?!$%&(){}=_#~';:.,<>|@"
 fi
 
+# you know what? fuck it, i wanna use cargo install. i'm lazy.
+export PATH="${PATH}:${HOME}/.cargo/bin"
+
 unset SCRIPT_DIR
