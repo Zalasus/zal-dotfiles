@@ -5,7 +5,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 Plug 'gentoo/gentoo-syntax'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-" Plug 'preservim/nerdtree'
 Plug 'rust-lang/rust.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-startify'
@@ -13,6 +12,7 @@ Plug 'lervag/vimtex'
 Plug 'ledger/vim-ledger'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'nvim-tree/nvim-tree.lua'
+Plug 'dense-analysis/ale'
 call plug#end()
 
 syntax enable
@@ -115,11 +115,11 @@ let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 nnoremap <leader>t :NvimTreeToggle<CR>
 
-" fugitive via leader
-nnoremap <leader>g :G<CR>
-
 " terminal emulator stuff
 tnoremap <Esc> <C-\><C-n>
+
+" fugitive
+nnoremap <leader>G :G<CR>
 
 " don't need indentation with motions
 nnoremap < <<
@@ -159,4 +159,8 @@ endif
 " use proper box-drawing character for vertical splits
 set fillchars+=vert:┃
 
-
+" ===== IDE features =====
+let g:ale_linters = { 'rust': ['analyzer'] }
+let g:ale_fixers = { 'rust': ['trim_whitespace'] }
+let g:ale_fix_on_save = 1
+nnoremap <leader>gd :ALEGoToDefinition<CR>
