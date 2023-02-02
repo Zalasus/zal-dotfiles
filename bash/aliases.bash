@@ -25,7 +25,7 @@ if has loginctl; then
     else
         alias lpoweroff="doas /sbin/shutdown -hP now"
         alias lreboot="doas /sbin/shutdown -r now"
-        alias lsuspend="doas ${SCRIPT_DIR}/suspend"
+        alias lsuspend="doas ${ZAL_DOTFILES}/bash/suspend"
     fi
 fi
 
@@ -38,11 +38,8 @@ if has nvim; then
     alias vi="nvim"
 fi
 
-# if applicable, register scripts from this repo
-if [[ -e "${SCRIPT_DIR}" ]]; then
-    alias zt="${SCRIPT_DIR}/zaltime/zt"
-    alias windoof="${SCRIPT_DIR}/boot-windows"
-fi
+alias zt="${ZAL_DOTFILES}/bash/zaltime/zt"
+alias windoof="${ZAL_DOTFILES}/bash/boot-windows"
 
 if has equery; then
     isusing() {

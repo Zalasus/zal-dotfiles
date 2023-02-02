@@ -3,9 +3,9 @@
 
 [[ $SHELL != "/bin/bash" ]] && echo "Must be bash" && exit 1
 
-update_prompt() { 
+update_prompt() {
 
-    # save last return code so building the prompt does not clobber it 
+    # save last return code so building the prompt does not clobber it
     local code=$?
 
     PS1=$(
@@ -13,7 +13,7 @@ update_prompt() {
         #  call without arguments to end powerline and return to normal formatting
         sect() {
             local sep=""
-            # derive unique name for section file from tty device (replace / by -) 
+            # derive unique name for section file from tty device (replace / by -)
             local tty=$(tty)
             local sectfile="/tmp/zalsect${tty//\//-}"
             if [[ ! -e $sectfile ]]; then

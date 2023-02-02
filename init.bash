@@ -1,6 +1,10 @@
-# getting the directory of the current script is a bit more complicated if
-#  the script is supposed to be sourced instead of run
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# init script for setting up my dotfiles.
+#
+#  source this from your bashrc or what you have
+
+# use this variable to refer to dotfiles
+export ZAL_DOTFILES=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # use gpg-agent for SSH
 export GPG_TTY="$(tty)"
@@ -10,15 +14,15 @@ gpg-connect-agent updatestartuptty /bye > /dev/null
 
 # the following stuff is only relevant for interactive shells
 if [[ $- == *i* ]] ; then
-    . ${SCRIPT_DIR}/aliases.bash
-    . ${SCRIPT_DIR}/completions.bash
+    . ${ZAL_DOTFILES}/bash/aliases.bash
+    . ${ZAL_DOTFILES}/bash/completions.bash
 
     HISTCONTROL=ignoredups:erasedups
     shopt -s histappend
 
     # use my custom prompt if using a graphical terminal
     if [[ $TERM == "alacritty" ]]; then
-        . ${SCRIPT_DIR}/prompt.bash
+        . ${ZAL_DOTFILES}/bash/prompt.bash
         PROMPT_COMMAND="update_prompt"
     fi
 
@@ -28,5 +32,3 @@ fi
 
 # you know what? fuck it, i wanna use cargo install. i'm lazy.
 export PATH="${PATH}:${HOME}/.cargo/bin"
-
-unset SCRIPT_DIR
