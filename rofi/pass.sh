@@ -32,6 +32,6 @@ else
     password=$(pass "${entry}" | head -n 1) || exit 1
 fi
 
-xdotool type "${password}"
+xdotool type --clearmodifiers "${password}"
 
 unset password
