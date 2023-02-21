@@ -12,7 +12,7 @@ Plug 'lervag/vimtex'
 Plug 'ledger/vim-ledger'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'nvim-tree/nvim-tree.lua'
-Plug 'dense-analysis/ale'
+Plug 'neovim/nvim-lspconfig'
 call plug#end()
 
 syntax enable
@@ -114,8 +114,6 @@ nnoremap > >>
 " vimtex
 let g:tex_flavor = 'latex'
 
-lua require("nvim-tree").setup()
-
 " ===== visual stuff =====
 " airline config
 let g:airline_powerline_fonts = 1
@@ -130,14 +128,16 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 set fillchars+=vert:┃
 
 " ===== IDE features =====
-let g:ale_linters = { 'rust': ['analyzer'] }
-let g:ale_fixers = { 'rust': ['trim_whitespace'] }
-let g:ale_fix_on_save = 1
-nnoremap <leader>gd :ALEGoToDefinition<CR>
-
 " highlight matching parens by underlining them
 highlight MatchParen term=underline cterm=underline gui=underline ctermbg=NONE
 
 " highlight trailing whitespace
 highlight RedundantSpaces ctermbg=red guibg=red
 match RedundantSpaces /\s\+$/
+
+" always show signcolumn, but don't color it
+set signcolumn=yes
+highlight SignColumn ctermbg=none guibg=none
+
+" ===== Hand over to Lua config =====
+luafile $ZAL_DOTFILES/vim/zal-vim.lua
