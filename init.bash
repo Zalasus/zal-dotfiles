@@ -31,4 +31,4 @@ if [[ $- == *i* ]] ; then
 fi
 
 # you know what? fuck it, i wanna use cargo install. i'm lazy.
-export PATH="${PATH}:${HOME}/.cargo/bin"
+export PATH="${HOME}/.cargo/bin:${PATH}"
