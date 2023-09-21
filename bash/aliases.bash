@@ -14,19 +14,16 @@ if has git; then
     alias gits="git status"
 fi
 
-if has loginctl; then
+# the logind power management works with polkit. shame
+if has loginctl && has pkexec; then
     alias llock="loginctl lock-session"
-
-    # the logind power management works with polkit. shame
-    if has pkexec; then
-        alias lpoweroff="loginctl poweroff"
-        alias lsuspend="loginctl suspend"
-        alias lreboot="loginctl reboot"
-    else
-        alias lpoweroff="doas /sbin/shutdown -hP now"
-        alias lreboot="doas /sbin/shutdown -r now"
-        alias lsuspend="doas ${ZAL_DOTFILES}/bash/suspend"
-    fi
+    alias lpoweroff="loginctl poweroff"
+    alias lsuspend="loginctl suspend"
+    alias lreboot="loginctl reboot"
+else
+    alias lpoweroff="doas /sbin/shutdown -hP now"
+    alias lreboot="doas /sbin/shutdown -r now"
+    alias lsuspend="doas ${ZAL_DOTFILES}/bash/suspend"
 fi
 
 if has maim && has xclip; then
@@ -40,6 +37,11 @@ fi
 
 alias zt="${ZAL_DOTFILES}/bash/zaltime/zt"
 alias windoof="${ZAL_DOTFILES}/bash/boot-windows"
+
+alias lw=librewolf
+
+# every damn time!
+alias flatpack=flatpak
 
 if has equery; then
     isusing() {
