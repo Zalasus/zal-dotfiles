@@ -1,4 +1,11 @@
 
+-- ensure nvim version
+local nvim_version = vim.version()
+if vim.version.lt(nvim_version, { 0, 9, 5 }) then
+    vim.notify("This configuration requires Neovim version 0.9.5 or higher", vim.log.levels.ERROR)
+    return
+end
+
 -- bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
