@@ -1,22 +1,6 @@
-" Zal's nvim config :3
-
-" load plugins, using vimplug
-call plug#begin('~/.local/share/nvim/plugged')
-Plug 'gentoo/gentoo-syntax'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'rust-lang/rust.vim'
-Plug 'tpope/vim-fugitive'
-Plug 'mhinz/vim-startify'
-Plug 'lervag/vimtex'
-Plug 'ledger/vim-ledger'
-Plug 'nvim-tree/nvim-web-devicons'
-Plug 'nvim-tree/nvim-tree.lua'
-Plug 'neovim/nvim-lspconfig'
-call plug#end()
-
-syntax enable
-filetype plugin indent on
+" Zal's vim config
+"  Some basic stuff that should work on vim and nvim is done here in vimscript. All the advanced,
+"  productive things that requires a recent nvim and plugins happen in the lua config invoked below.
 
 " don't care about vi compatibility
 set nocompatible
@@ -38,13 +22,6 @@ set nowrap
 set tw=100
 set colorcolumn=+1
 
-" enable mouse-terminal interaction
-set mouse=a
-
-" key timeout
-set ttimeout
-set ttimeoutlen=50
-
 " always display a status line even if there is only one window
 set laststatus=2
 
@@ -54,13 +31,8 @@ set hidden
 " default spellcheck language
 set spelllang=en
 
-" don't create swap files. they tend to hang vim when the disk has high load,
-"  and my compulsive :w habit makes them superflous, anyway. also, when was the
-"  last time you saw vim crash?
-set noswapfile
-
 " use system clipboard transparently when yanking
-set clipboard=unnamed
+set clipboard=unnamed,unnamedplus
 
 " smart case search (only use case sensitive search if query contains uppercase)
 set ignorecase
@@ -78,12 +50,6 @@ nnoremap <leader>d :bd!<CR>
 nnoremap <leader>n :enew<CR>
 nnoremap <leader>q :q<CR>
 
-" faster compulsive saving
-nnoremap <leader>w :w<CR>
-
-" startify session restore
-autocmd! VimLeave * SSave! Previous
-
 " make arrow keys navigate splits rather than the cursor
 noremap <Up> <C-w>k
 noremap <Down> <C-w>j
@@ -98,46 +64,27 @@ inoremap <Right> <nop>
 " without yanking it
 vnoremap <leader>p "_dP
 
-" nvimtree stuff
-nnoremap <leader>t :NvimTreeToggle<CR>
-
-" terminal emulator stuff
-tnoremap <Esc> <C-\><C-n>
-
-" fugitive
-nnoremap <leader>G :G<CR>
-
 " don't need indentation with motions
 nnoremap < <<
 nnoremap > >>
 
-" vimtex
-let g:tex_flavor = 'latex'
-
-" ===== visual stuff =====
-" airline config
-let g:airline_powerline_fonts = 1
-let g:airline_theme = 'simple'
-let g:airline_highlighting_cache = 1
-let g:airline_extensions = ['branch', 'tabline']
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-let g:airline#extensions#tabline#fnamemod = ':t'
-
 " use proper box-drawing character for vertical splits
-set fillchars+=vert:┃
+set fillchars+=vert:│
 
-" ===== IDE features =====
+" enable syntax higlighting
+syntax enable
+
 " highlight matching parens by underlining them
 highlight MatchParen term=underline cterm=underline gui=underline ctermbg=NONE
-
-" highlight trailing whitespace
-highlight RedundantSpaces ctermbg=red guibg=red
-match RedundantSpaces /\s\+$/
 
 " always show signcolumn, but don't color it
 set signcolumn=yes
 highlight SignColumn ctermbg=none guibg=none
 
-" ===== Hand over to Lua config =====
-luafile $ZAL_DOTFILES/vim/zal-vim.lua
+" enable filetype detection, using type-specific plugins and indent files when available
+filetype plugin indent on
+
+if has('nvim')
+    luafile $ZAL_DOTFILES/vim/zal-neovim.lua
+endif
+
