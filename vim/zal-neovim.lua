@@ -52,6 +52,15 @@ local telescope = {
     dependencies = { 'nvim-lua/plenary.nvim' }
 }
 
+local cmp = {
+    'hrsh7th/nvim-cmp',
+    dependencies = {
+        'hrsh7th/cmp-nvim-lsp',
+        'hrsh7th/cmp-vsnip',
+        'hrsh7th/vim-vsnip',
+    }
+}
+
 require("lazy").setup({
     "gentoo/gentoo-syntax",
     "tpope/vim-fugitive",
@@ -59,19 +68,19 @@ require("lazy").setup({
     "ledger/vim-ledger",
     "nvim-tree/nvim-web-devicons",
     "neovim/nvim-lspconfig",
-    --"hrsh7th/nvim-cmp",
     -- neotree,
     nvim_tree,
     lualine,
     bufferline,
     telescope,
     "folke/tokyonight.nvim",
+    cmp,
 })
 
 -- colorscheme
 
 require('tokyonight').setup({
-    style = 'storm',
+    style = 'night',
     --transparent = true,
 })
 vim.cmd[[colorscheme tokyonight]]
@@ -172,11 +181,7 @@ vim.opt.mouse = ''
 -- Use an on_attach function to only map the following keys after the language server attaches to
 -- the current buffer
 local on_attach = function(client, bufnr)
-    -- Enable completion triggered by <c-x><c-o> (eugh)
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-    -- Mappings.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
     local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
     local telescope_builtin = require('telescope.builtin')
@@ -189,10 +194,6 @@ local on_attach = function(client, bufnr)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
     vim.keymap.set('n', '<leader>cf', function() vim.lsp.buf.format { async = true } end, bufopts)
 end
-
--- remap omnifunc to something sane
-vim.keymap.set('i', '<C-Space>', '<C-x><C-o>')
-vim.keymap.set('i', '<C-@>', '<C-Space>')
 
 local lsp_flags = {
   debounce_text_changes = 300,
@@ -225,4 +226,29 @@ lspconfig.rust_analyzer.setup {
         }
     }
 }
+
+-- nvim-cmp (autocompletion engine)
+local cmp = require('cmp')
+cmp.setup({
+    snippet = {
+        expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body)
+        end
+    },
+    mapping = cmp.mapping.preset.insert({
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.abort(),
+        ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+        ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+        ['<CR>'] = cmp.mapping.confirm({ select = false }),
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+    }, { { name = 'buffer' } } ),
+})
+
+-- remap omnifunc to something sane
+-- (not using omnifunc rn, using nvim-cmp instead)
+--vim.keymap.set('i', '<C-Space>', '<C-x><C-o>')
+--vim.keymap.set('i', '<C-@>', '<C-Space>')
 
