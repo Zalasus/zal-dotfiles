@@ -7,7 +7,6 @@
 tofi=~/bin/tofi
 
 # debug logging facility for debugging the interaction with the agent.
-#  be aware that this will log your passphrase in plain text!
 DEBUG=0
 debug() {
     if [[ "${DEBUG}" ]]; then
@@ -91,6 +90,11 @@ ipc_send() {
     echo $@
 }
 
+ipc_send_sensitive() {
+    debug "ipc (tx) <sensitive data hidden>"
+    echo $@
+}
+
 description=""
 prompt=""
 errormsg=""
@@ -137,8 +141,9 @@ do
         GETPIN)
             pin=$(getpin)
             if [[ $? -eq 0 ]]; then
-                ipc_send "D $(percentescape ${pin})"
+                ipc_send_sensitive "D $(percentescape ${pin})"
                 ipc_send OK
+                unset pin
             else
                 ipc_send "ERR 83886179 Operation cancelled <Pinentry>"
             fi
