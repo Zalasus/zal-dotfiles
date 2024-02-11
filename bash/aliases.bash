@@ -30,11 +30,6 @@ if has maim && has xclip; then
     alias ss2cb="maim -s | xclip -t image/png -selection clipboard"
 fi
 
-if has nvim; then
-    alias vim="nvim"
-    alias vi="nvim"
-fi
-
 alias zt="${ZAL_DOTFILES}/bash/zaltime/zt"
 alias windoof="${ZAL_DOTFILES}/bash/boot-windows"
 
