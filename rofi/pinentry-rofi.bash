@@ -12,10 +12,10 @@ while :; do
                 DISPLAY=${2}
                 shift
             else
-                DISPLAY= 
+                DISPLAY=
             fi;;
         --display=?*)
-            DISPLAY=${1#*=}            
+            DISPLAY=${1#*=}
             ;;
         --display=)
             DISPLAY=
@@ -105,7 +105,7 @@ do
             esac
             echo OK;;
         GETPIN)
-            pin=$(getpin) 
+            pin=$(getpin)
             if [[ $? -eq 0 ]]; then
                 echo "D $(percentescape ${pin})"
                 echo OK

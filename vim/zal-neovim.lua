@@ -44,13 +44,13 @@ local nvim_tree = {
 
 local lualine = {
     'nvim-lualine/lualine.nvim',
-    dependencies = 'nvim-tree/nvim-web-devicons'
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
 }
 
 local bufferline = {
     'akinsho/bufferline.nvim',
     version = "*",
-    dependencies = 'nvim-tree/nvim-web-devicons'
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
 }
 
 local telescope = {
@@ -68,9 +68,19 @@ local cmp = {
     }
 }
 
+local neogit = {
+    "NeogitOrg/neogit",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "sindrets/diffview.nvim",
+        "nvim-telescope/telescope.nvim",
+    },
+    config = true
+}
+
 require("lazy").setup({
     "gentoo/gentoo-syntax",
-    "tpope/vim-fugitive",
+    --"tpope/vim-fugitive",
     "lervag/vimtex",
     "ledger/vim-ledger",
     "nvim-tree/nvim-web-devicons",
@@ -82,6 +92,7 @@ require("lazy").setup({
     telescope,
     "folke/tokyonight.nvim",
     cmp,
+    neogit,
 })
 
 -- colorscheme

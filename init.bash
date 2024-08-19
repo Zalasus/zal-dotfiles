@@ -7,10 +7,12 @@
 export ZAL_DOTFILES=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # use gpg-agent for SSH
-export GPG_TTY="$(tty)"
-export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-gpgconf --launch gpg-agent
-gpg-connect-agent updatestartuptty /bye > /dev/null
+if [[ -n "${WAYLAND_DISPLAY}" ]] || [[ -n "${DISPLAY}" ]]; then
+    export GPG_TTY="$(tty)"
+    export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+    gpgconf --launch gpg-agent
+    gpg-connect-agent updatestartuptty /bye > /dev/null
+fi
 
 # the following stuff is only relevant for interactive shells
 if [[ $- == *i* ]] ; then
@@ -32,3 +34,8 @@ fi
 
 # you know what? fuck it, i wanna use cargo install. i'm lazy.
 export PATH="${HOME}/.cargo/bin:${PATH}"
+
+
+if [[ -x "$(which zoxide 2> /dev/null)" ]]; then
+    eval "$(zoxide init bash)"
+fi
