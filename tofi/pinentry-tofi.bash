@@ -7,7 +7,7 @@
 tofi=~/bin/tofi
 
 # debug logging facility for debugging the interaction with the agent.
-DEBUG=0
+DEBUG=1
 debug() {
     if [[ "${DEBUG}" ]]; then
         echo "[$(date --rfc-3339=seconds)] $@" >> ~/pinentry-tofi.log
