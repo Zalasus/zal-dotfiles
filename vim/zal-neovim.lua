@@ -6,17 +6,21 @@ if vim.version.lt(nvim_version, { 0, 9, 5 }) then
     return
 end
 
+-- vim options
+vim.opt.termguicolors = true
+vim.opt.mouse = '' -- No mouse, thank you. Teaches me bad habits
+
 -- bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
+    vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        "--branch=stable", -- latest stable release
+        lazypath,
+    })
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -26,46 +30,129 @@ local neotree = {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
+        "nvim-lua/plenary.nvim",
+        "nvim-tree/nvim-web-devicons",
+        "MunifTanjim/nui.nvim",
     },
     keys = {
-      { "<leader>t", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
+        { "<leader>t", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
     },
+    enabled = false,
 }
 
 local nvim_tree = {
     'nvim-tree/nvim-tree.lua',
     keys = {
-      { "<leader>t", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" },
+        { "<leader>t", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" },
     },
+    enabled = false,
 }
 
 local lualine = {
     'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' }
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    opts = {
+        sections = {
+            lualine_a = { 'mode' }
+        },
+        theme = 'tokyonight',
+    },
 }
 
 local bufferline = {
     'akinsho/bufferline.nvim',
     version = "*",
-    dependencies = { 'nvim-tree/nvim-web-devicons' }
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    opts = {
+        options = {
+            show_close_icon = false,
+            show_buffer_close_icons = false,
+            numbers = 'ordinal',
+            color_icons = true,
+            separator_style = 'slant',
+            always_show_bufferline = true,
+            diagnostics = 'nvim_lsp',
+            --themeable = true,
+            offsets = {
+                {
+                    filetype = 'NvimTree',
+                    text = 'NvimTree',
+                    highlight = 'Directory',
+                    separator = true,
+                }
+            },
+        },
+        highlights = {
+        },
+    },
 }
 
 local telescope = {
     'nvim-telescope/telescope.nvim',
-    tag = '0.1.5',
-    dependencies = { 'nvim-lua/plenary.nvim' }
+    tag = '0.1.8',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+        require('telescope').setup({})
+        local telescope_builtin = require('telescope.builtin')
+        local opts = { noremap = true, silent = true }
+        vim.keymap.set('n', '<leader>ff',  telescope_builtin.find_files, opts)
+        vim.keymap.set('n', '<leader>fg',  telescope_builtin.live_grep, opts)
+        vim.keymap.set('n', '<leader>fs',  telescope_builtin.lsp_workspace_symbols, opts)
+    end
+}
+
+local telescope_file_browser = {
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = {
+        "nvim-telescope/telescope.nvim",
+        "nvim-lua/plenary.nvim"
+    },
+    keys = {
+        { "<leader>fb", ":Telescope file_browser<CR>" },
+    }
 }
 
 local cmp = {
     'hrsh7th/nvim-cmp',
+    event = "VeryLazy",
     dependencies = {
         'hrsh7th/cmp-nvim-lsp',
         'hrsh7th/cmp-vsnip',
         'hrsh7th/vim-vsnip',
-    }
+    },
+    config = function()
+        local cmp = require("cmp")
+        cmp.setup({
+            snippet = {
+                expand = function(args)
+                    vim.fn["vsnip#anonymous"](args.body)
+                end
+            },
+            mapping = cmp.mapping.preset.insert({
+                ['<C-Space>'] = cmp.mapping.complete(),
+                ['<C-e>'] = cmp.mapping.abort(),
+                ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+                ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+                ['<CR>'] = cmp.mapping.confirm({ select = false }),
+            }),
+            sources = cmp.config.sources(
+                { { name = 'nvim_lsp' } },
+                { { name = 'buffer' } }
+            ),
+        })
+    end,
+}
+
+local startup = {
+    "startup-nvim/startup.nvim",
+    dependencies = {
+        "nvim-telescope/telescope.nvim",
+        "nvim-lua/plenary.nvim",
+        "nvim-telescope/telescope-file-browser.nvim"
+    },
+    opts = {
+        theme = "dashboard",
+    },
 }
 
 local neogit = {
@@ -75,123 +162,114 @@ local neogit = {
         "sindrets/diffview.nvim",
         "nvim-telescope/telescope.nvim",
     },
-    config = true
+    keys = {
+        { "<leader>gi", "<cmd>Neogit<cr>", desc = "Neogit" }
+    },
+    opts = {
+        graph_style = "unicode",
+        kind = "tab",
+    },
+}
+
+local noice = {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+        lsp = {
+            -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+            override = {
+                ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+                ["vim.lsp.util.stylize_markdown"] = true,
+                ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+            },
+        },
+        -- you can enable a preset for easier configuration
+        presets = {
+            bottom_search = true, -- use a classic bottom cmdline for search
+            command_palette = false, -- position the cmdline and popupmenu together
+            long_message_to_split = true, -- long messages will be sent to a split
+            inc_rename = false, -- enables an input dialog for inc-rename.nvim
+            lsp_doc_border = true, -- add a border to hover docs and signature help
+        },
+    },
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    }
+}
+
+local illuminate = {
+    "RRethy/vim-illuminate",
+    event = "VeryLazy",
+}
+
+local indentmini = {
+    "nvimdev/indentmini.nvim",
+    event = "VeryLazy",
+    opts = {
+        minlevel = 1,
+        char = "│",
+    },
+}
+
+local vimtex = {
+    "lervag/vimtex",
+    ft = "tex",
+    config = function()
+        -- vimtex gets very bitchy if this is not set.
+        vim.g.tex_flavor = "latex"
+    end,
+}
+
+local tokyonight = {
+    "folke/tokyonight.nvim",
+    opts = {
+        style = 'night',
+        -- transparent = true,
+    },
+}
+
+local ledger = {
+    "ledger/vim-ledger",
+    ft = "ledger",
 }
 
 require("lazy").setup({
     "gentoo/gentoo-syntax",
-    --"tpope/vim-fugitive",
-    "lervag/vimtex",
-    "ledger/vim-ledger",
-    "nvim-tree/nvim-web-devicons",
     "neovim/nvim-lspconfig",
-    -- neotree,
+    neotree,
     nvim_tree,
     lualine,
     bufferline,
     telescope,
-    "folke/tokyonight.nvim",
+    telescope_file_browser,
     cmp,
+    startup,
     neogit,
+    noice,
+    illuminate,
+    indentmini,
+    vimtex,
+    ledger,
+    tokyonight,
 })
 
--- colorscheme
 
-require('tokyonight').setup({
-    style = 'night',
-    --transparent = true,
-})
+-- set default colorscheme
+
 vim.cmd[[colorscheme tokyonight]]
 
--- require('neo-tree').setup()
-require('nvim-tree').setup()
-
--- vimtex. gets very bitchy if this is not set.
-vim.g.tex_flavor = "latex"
-
--- lualine
-local lualine = require('lualine')
-
-local lualine_diagnostics = {
-    'diagnostics',
-    sources = { 'nvim_lsp' },
-    sections = { 'error', 'warn', 'info', 'hint' },
-    diagnostics_color = {
-        -- Same values as the general color option can be used here.
-        error = 'DiagnosticError', -- Changes diagnostics' error color.
-        warn  = 'DiagnosticWarn',  -- Changes diagnostics' warn color.
-        info  = 'DiagnosticInfo',  -- Changes diagnostics' info color.
-        hint  = 'DiagnosticHint',  -- Changes diagnostics' hint color.
-    },
-    symbols = {error = 'E', warn = 'W', info = 'I', hint = 'H'},
-    colored = true,           -- Displays diagnostics status in color if set to true.
-    update_in_insert = false, -- Update diagnostics in insert mode.
-    always_visible = false,   -- Show diagnostics even if there are none.
-}
-
-local lualine_config = {
-    sections = {
-        lualine_a = { 'mode' }
-    },
-    theme = 'tokyonight',
-}
-
-lualine.setup(lualine_config)
-
--- bufferline
-vim.opt.termguicolors = true
-local bufferline = require('bufferline')
-
-local bufferline_options = {
-    show_close_icon = false,
-    show_buffer_close_icons = false,
-    numbers = 'ordinal',
-    color_icons = true,
-    separator_style = 'slant',
-    always_show_bufferline = true,
-    diagnostics = 'nvim_lsp',
-    --themeable = true,
-    offsets = {
-        {
-            filetype = 'NvimTree',
-            text = 'NvimTree',
-            highlight = 'Directory',
-            separator = true,
-        }
-    },
-}
-
-local bufferline_highlights = {
-}
-
-bufferline.setup{ options = bufferline_options, highlights = bufferline_highlights }
-
--- Telescope
-
-require('telescope').setup{
-}
-local telescope_builtin = require('telescope.builtin')
-local opts = { noremap = true, silent = true }
-vim.keymap.set('n', '<leader>ff',  telescope_builtin.find_files, opts)
-vim.keymap.set('n', '<leader>fg',  telescope_builtin.live_grep, opts)
-vim.keymap.set('n', '<leader>fs',  telescope_builtin.lsp_workspace_symbols, opts)
 
 -- ==== Line endings etc. ====
 
 -- autmatically strip trailing whitespace on save
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-    pattern = {"*"},
+    pattern = { "*" },
     callback = function(ev)
         save_cursor = vim.fn.getpos(".")
         vim.cmd([[%s/\s\+$//e]])
         vim.fn.setpos(".", save_cursor)
     end,
 })
-
--- ==== Nvim options ====
-
--- No mouse, thank you. Teaches me bad habits
-vim.opt.mouse = ''
 
 
 -- ==== LSP config =====
@@ -208,6 +286,7 @@ local on_attach = function(client, bufnr)
     vim.keymap.set('n', 'gr', telescope_builtin.lsp_references, bufopts)
 
     vim.keymap.set('n', '<leader>ch', vim.lsp.buf.hover, bufopts)
+    vim.keymap.set('n', '<leader>ce', vim.diagnostic.open_float, bufopts)
     vim.keymap.set('n', '<leader>cr', vim.lsp.buf.rename, bufopts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
     vim.keymap.set('n', '<leader>cf', function() vim.lsp.buf.format { async = true } end, bufopts)
@@ -228,7 +307,7 @@ function get_rust_analyzer_path()
     local exit = handle:close()
     local ra_path
     if exit then
-        ra_path= vim.trim(output)
+        ra_path = vim.trim(output)
     else
         ra_path = "rust-analyzer"
     end
@@ -245,25 +324,10 @@ lspconfig.rust_analyzer.setup {
     }
 }
 
--- nvim-cmp (autocompletion engine)
-local cmp = require('cmp')
-cmp.setup({
-    snippet = {
-        expand = function(args)
-            vim.fn["vsnip#anonymous"](args.body)
-        end
-    },
-    mapping = cmp.mapping.preset.insert({
-        ['<C-Space>'] = cmp.mapping.complete(),
-        ['<C-e>'] = cmp.mapping.abort(),
-        ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-        ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-        ['<CR>'] = cmp.mapping.confirm({ select = false }),
-    }),
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-    }, { { name = 'buffer' } } ),
-})
+lspconfig.clangd.setup {
+    filetypes = { "c", "cpp", "cxx", "cc" },
+    on_attach = on_attach,
+}
 
 -- remap omnifunc to something sane
 -- (not using omnifunc rn, using nvim-cmp instead)
